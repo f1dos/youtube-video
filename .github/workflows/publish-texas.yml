@@ -1,0 +1,41 @@
+name: Publish Texas History 1080p60
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-texas.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VIDEO_URL: https://at.adobe.com/zG4Fj0GTfKPvXXfL
+      VIDEO_FILE: Texas_History_Ultra_Smooth_Cinematic_1080p60.mp4
+    steps:
+      - name: Download verified Texas movie
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 --retry-delay 3 --output "$VIDEO_FILE" "$VIDEO_URL"
+          size=$(stat -c%s "$VIDEO_FILE")
+          echo "Downloaded bytes: $size"
+          if (( size < 290000000 )); then
+            echo "Download did not match expected 314 MB video size" >&2
+            exit 1
+          fi
+          file "$VIDEO_FILE"
+      - name: Create public GitHub Release with downloadable MP4
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create texas-1080p60-2026-10-30 "$VIDEO_FILE" \
+            --repo "${{ github.repository }}" \
+            --title "Texas History — Ultra Smooth Cinematic (1080p60)" \
+            --notes "States Explained: The History of Texas. Full MP4, 1920 x 1080, 60 fps, approx 8 minutes 26 seconds." \
+            --target main
