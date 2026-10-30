@@ -1,4 +1,4 @@
-name: Publish Final Texas States Explained 1080p60
+name: Publish Dynamic Texas 1080p60
 on:
   push:
     branches: [main]
@@ -15,27 +15,22 @@ jobs:
     timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
-      VIDEO_URL: https://at.adobe.com/0U6kYqYcpsi9qMQH
-      VIDEO_FILE: Texas_States_Explained_1080p60.mp4
+      VIDEO_URL: https://at.adobe.com/v6Hb6vdyquqD0DHj
+      VIDEO_FILE: Texas_States_Explained_Dynamic_1080p60.mp4
     steps:
-      - name: Download final Texas movie
+      - name: Download and verify the finished movie
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --location --retry 5 --retry-delay 3 --output "$VIDEO_FILE" "$VIDEO_URL"
-          size=$(stat -c%s "$VIDEO_FILE")
-          echo "Downloaded bytes: $size"
-          if (( size < 410000000 )); then
-            echo "Download did not match expected 417 MB video size" >&2
-            exit 1
-          fi
-          file "$VIDEO_FILE"
-      - name: Create public GitHub Release with downloadable MP4
+          test "$(stat -c%s "$VIDEO_FILE")" = "364939771"
+          echo "a1722e948652cb2af1b40f860b94f49dae179a97fbe5ab0784222e835c494018  $VIDEO_FILE" | sha256sum --check
+      - name: Publish downloadable MP4
         shell: bash
         run: |
           set -euo pipefail
-          gh release create texas-states-explained-final-1080p60 "$VIDEO_FILE" \
+          gh release create texas-dynamic-1080p60-2026-10-30 "$VIDEO_FILE" \
             --repo "${{ github.repository }}" \
-            --title "Texas — States Explained (Final 1080p60)" \
-            --notes "Final States Explained edit: 1920 x 1080, 60 fps, 8 minutes 26 seconds, highlighted subtitles, smooth zooms, transitions and parallax." \
+            --title "Texas — Dynamic Edition (1080p60)" \
+            --notes "Updated montage: 18 parallax scenes, varied smooth zooms and camera moves, transitions with sound accents, 29 animated key captions, and synchronized word-highlight subtitles. 1920 x 1080, 60 fps, 8m26s. Full-file decoding verified." \
             --target main
