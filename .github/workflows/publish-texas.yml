@@ -1,4 +1,4 @@
-name: Publish Texas History 1080p60
+name: Publish Final Texas States Explained 1080p60
 on:
   push:
     branches: [main]
@@ -12,21 +12,21 @@ permissions:
 jobs:
   publish-video:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
-      VIDEO_URL: https://at.adobe.com/zG4Fj0GTfKPvXXfL
-      VIDEO_FILE: Texas_History_Ultra_Smooth_Cinematic_1080p60.mp4
+      VIDEO_URL: https://at.adobe.com/0U6kYqYcpsi9qMQH
+      VIDEO_FILE: Texas_States_Explained_1080p60.mp4
     steps:
-      - name: Download verified Texas movie
+      - name: Download final Texas movie
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --location --retry 5 --retry-delay 3 --output "$VIDEO_FILE" "$VIDEO_URL"
           size=$(stat -c%s "$VIDEO_FILE")
           echo "Downloaded bytes: $size"
-          if (( size < 290000000 )); then
-            echo "Download did not match expected 314 MB video size" >&2
+          if (( size < 410000000 )); then
+            echo "Download did not match expected 417 MB video size" >&2
             exit 1
           fi
           file "$VIDEO_FILE"
@@ -34,8 +34,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release create texas-1080p60-2026-10-30 "$VIDEO_FILE" \
+          gh release create texas-states-explained-final-1080p60 "$VIDEO_FILE" \
             --repo "${{ github.repository }}" \
-            --title "Texas History — Ultra Smooth Cinematic (1080p60)" \
-            --notes "States Explained: The History of Texas. Full MP4, 1920 x 1080, 60 fps, approx 8 minutes 26 seconds." \
+            --title "Texas — States Explained (Final 1080p60)" \
+            --notes "Final States Explained edit: 1920 x 1080, 60 fps, 8 minutes 26 seconds, highlighted subtitles, smooth zooms, transitions and parallax." \
             --target main
