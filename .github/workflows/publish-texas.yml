@@ -1,4 +1,4 @@
-name: Publish Dynamic Texas 1080p60
+name: Publish Texas Shorts 1080x1920 60fps
 on:
   push:
     branches: [main]
@@ -10,27 +10,27 @@ permissions:
   contents: write
 
 jobs:
-  publish-video:
+  publish-shorts:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
-      VIDEO_URL: https://at.adobe.com/v6Hb6vdyquqD0DHj
-      VIDEO_FILE: Texas_States_Explained_Dynamic_1080p60.mp4
     steps:
-      - name: Download and verify the finished movie
+      - name: Download and verify three Shorts
         shell: bash
         run: |
           set -euo pipefail
-          curl --fail --location --retry 5 --retry-delay 3 --output "$VIDEO_FILE" "$VIDEO_URL"
-          test "$(stat -c%s "$VIDEO_FILE")" = "364939771"
-          echo "a1722e948652cb2af1b40f860b94f49dae179a97fbe5ab0784222e835c494018  $VIDEO_FILE" | sha256sum --check
-      - name: Publish downloadable MP4
+          curl --fail --location --retry 5 --retry-delay 3 -o 01_The_Alamo.mp4 "https://at.adobe.com/t0F9KQNRq4Uwa81D"
+          curl --fail --location --retry 5 --retry-delay 3 -o 02_18_Minutes.mp4 "https://at.adobe.com/XWzRksFV3j5x9Q95"
+          curl --fail --location --retry 5 --retry-delay 3 -o 03_Oil_to_the_Moon.mp4 "https://at.adobe.com/PnmxQDvJjJp0CNIh"
+          test "$(stat -c%s 01_The_Alamo.mp4)" = "26985931"
+          test "$(stat -c%s 02_18_Minutes.mp4)" = "13041917"
+          test "$(stat -c%s 03_Oil_to_the_Moon.mp4)" = "19259440"
+          echo "2dadfe4f8b90777ffa3b58f80e45dfac744d5fb7b54b94f471884193f599b1f5  01_The_Alamo.mp4" | sha256sum --check
+          echo "470927718a500758025e231040fe10761f5513ab9eb59a01264d86c96f40047e  02_18_Minutes.mp4" | sha256sum --check
+          echo "e4dded4a74be0af65692a3b9d443356c7dd07380c5fea487a0385e65d8081e69  03_Oil_to_the_Moon.mp4" | sha256sum --check
+      - name: Publish Shorts release
         shell: bash
         run: |
           set -euo pipefail
-          gh release create texas-dynamic-1080p60-2026-10-30 "$VIDEO_FILE" \
-            --repo "${{ github.repository }}" \
-            --title "Texas — Dynamic Edition (1080p60)" \
-            --notes "Updated montage: 18 parallax scenes, varied smooth zooms and camera moves, transitions with sound accents, 29 animated key captions, and synchronized word-highlight subtitles. 1920 x 1080, 60 fps, 8m26s. Full-file decoding verified." \
-            --target main
+          gh release create texas-shorts-vertical-2026-10-31             01_The_Alamo.mp4 02_18_Minutes.mp4 03_Oil_to_the_Moon.mp4             --repo "${{ github.repository }}"             --title "Texas — 3 Vertical Shorts (1080x1920, 60fps)"             --notes "Three selected moments from States Explained: The Alamo; the 18-minute Battle of San Jacinto; and Texas from Spindletop oil to Mission Control. Vertical reframing, animated zooms, transition accents, and synchronized word-highlight subtitles. Full-file decoding verified."             --target main
